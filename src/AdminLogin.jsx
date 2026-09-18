@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 function AdminLogin({ onLogin }) {
@@ -9,16 +10,16 @@ function AdminLogin({ onLogin }) {
 
     try {
       const response = await fetch(
-       `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             username,
-            password
-          })
+            password,
+          }),
         }
       );
 
@@ -40,15 +41,21 @@ function AdminLogin({ onLogin }) {
   };
 
   return (
-    <div className="entry-section">
-      <div className="form-card">
+    <div className="login-page">
+      <div className="login-card">
+
+        <div className="login-icon">
+          🔐
+        </div>
+
         <h2>Admin Login</h2>
 
-        <p className="form-subtitle">
-          Login to access the visitor dashboard.
+        <p className="login-subtitle">
+          Login to access the visitor dashboard
         </p>
 
         <form onSubmit={handleSubmit}>
+
           <label>Username</label>
 
           <input
@@ -69,13 +76,20 @@ function AdminLogin({ onLogin }) {
             required
           />
 
-          <button type="submit" className="enter-btn">
-            Login
+          <button type="submit" className="login-btn">
+            Login to Dashboard
           </button>
+
         </form>
+
+        <p className="login-footer">
+          Admin access only
+        </p>
+
       </div>
     </div>
   );
 }
 
 export default AdminLogin;
+

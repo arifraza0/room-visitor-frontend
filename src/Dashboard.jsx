@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 
 function Dashboard() {
@@ -6,17 +7,16 @@ function Dashboard() {
   const [dateFilter, setDateFilter] = useState("all");
   const [selectedVisitor, setSelectedVisitor] = useState(null);
 
-  // Fetch visitors
   const fetchVisitors = async () => {
     try {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/visitors`,
+        `${import.meta.env.VITE_API_URL}/api/visitors`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -32,18 +32,17 @@ function Dashboard() {
     }
   };
 
-  // Mark Exit
   const handleExit = async (id) => {
     try {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/visitors/${id}/exit`,
+        `${import.meta.env.VITE_API_URL}/api/visitors/${id}/exit`,
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -61,7 +60,6 @@ function Dashboard() {
     }
   };
 
-  // Delete Visitor
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this visitor?"
@@ -73,12 +71,12 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-     `${import.meta.env.VITE_API_URL}/api/visitors/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/visitors/${id}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -96,31 +94,29 @@ function Dashboard() {
     }
   };
 
-  // Load visitors
   useEffect(() => {
     fetchVisitors();
   }, []);
 
-  // Today's date
   const today = new Date();
 
-  // Currently inside
+  const isSameDate = (date1, date2) => {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  };
+
   const insideVisitors = visitors.filter(
     (visitor) => visitor.status === "Inside"
   );
 
-  // Today's visitors
   const todayVisitors = visitors.filter((visitor) => {
     const entryDate = new Date(visitor.entryTime);
-
-    return (
-      entryDate.getDate() === today.getDate() &&
-      entryDate.getMonth() === today.getMonth() &&
-      entryDate.getFullYear() === today.getFullYear()
-    );
+    return isSameDate(entryDate, today);
   });
 
-  // Date filter
   const dateFilteredVisitors = visitors.filter((visitor) => {
     const entryDate = new Date(visitor.entryTime);
 
@@ -129,27 +125,19 @@ function Dashboard() {
     }
 
     if (dateFilter === "today") {
-      return (
-        entryDate.getDate() === today.getDate() &&
-        entryDate.getMonth() === today.getMonth() &&
-        entryDate.getFullYear() === today.getFullYear()
-      );
+      return isSameDate(entryDate, today);
     }
 
     if (dateFilter === "yesterday") {
-      const yesterday = new Date();
-      yesterday.setDate(today.getDate() - 1);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
 
-      return (
-        entryDate.getDate() === yesterday.getDate() &&
-        entryDate.getMonth() === yesterday.getMonth() &&
-        entryDate.getFullYear() === yesterday.getFullYear()
-      );
+      return isSameDate(entryDate, yesterday);
     }
 
     if (dateFilter === "7days") {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(today.getDate() - 7);
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       return entryDate >= sevenDaysAgo && entryDate <= today;
     }
@@ -157,99 +145,93 @@ function Dashboard() {
     return true;
   });
 
-  // Search filter
-  const filteredVisitors = dateFilteredVisitors.filter(
-    (visitor) => {
-      const text = search.toLowerCase();
+  const filteredVisitors = dateFilteredVisitors.filter((visitor) => {
+    const text = search.toLowerCase();
 
-      return (
-        visitor.name.toLowerCase().includes(text) ||
-        visitor.mobile.includes(text) ||
-        visitor.purpose.toLowerCase().includes(text) ||
-        (visitor.organization &&
-          visitor.organization.toLowerCase().includes(text)) ||
-        (visitor.personToMeet &&
-          visitor.personToMeet.toLowerCase().includes(text))
-      );
-    }
-  );
+    return (
+      visitor.name?.toLowerCase().includes(text) ||
+      visitor.mobile?.includes(text) ||
+      visitor.purpose?.toLowerCase().includes(text) ||
+      visitor.organization?.toLowerCase().includes(text) ||
+      visitor.personToMeet?.toLowerCase().includes(text)
+    );
+  });
 
   return (
     <div className="dashboard">
 
-      <h1>Visitor Dashboard</h1>
+      <div className="dashboard-heading">
+        <div>
+          <h1>Visitor Dashboard</h1>
+          <p>Manage and monitor all room visitors</p>
+        </div>
+      </div>
+      <button
+  className="refresh-btn"
+  onClick={fetchVisitors}
+>
+  🔄 Refresh
+</button>
 
-      {/* Statistics */}
       <div className="stats">
 
         <div className="card">
           <h3>Total Visitors</h3>
           <h2>{visitors.length}</h2>
+          <p>All time</p>
         </div>
 
         <div className="card">
           <h3>Today's Visitors</h3>
           <h2>{todayVisitors.length}</h2>
+          <p>Today</p>
         </div>
 
         <div className="card">
           <h3>Currently Inside</h3>
           <h2>{insideVisitors.length}</h2>
+          <p>Active visitors</p>
         </div>
 
         <div className="card">
           <h3>Exited</h3>
-          <h2>
-            {visitors.length - insideVisitors.length}
-          </h2>
+          <h2>{visitors.length - insideVisitors.length}</h2>
+          <p>Completed visits</p>
         </div>
 
       </div>
 
-      {/* Date Filter */}
-      <div style={{ marginBottom: "20px" }}>
+      <div className="dashboard-controls">
 
-        <label
-          style={{
-            fontWeight: "bold",
-            marginRight: "10px"
-          }}
-        >
-          Filter by Date:
-        </label>
+        <div className="date-filter">
+          <label>Filter by Date</label>
 
-        <select
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            fontSize: "15px"
-          }}
-        >
-          <option value="all">All Visitors</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="7days">Last 7 Days</option>
-        </select>
+          <select
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          >
+            <option value="all">All Visitors</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="7days">Last 7 Days</option>
+          </select>
+        </div>
+
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search visitor..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
       </div>
 
-      {/* Search */}
-      <div className="search-box">
-
-        <input
-          type="text"
-          placeholder="Search by name, mobile or purpose..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
+      <div className="visitor-list-heading">
+        <h2>Visitor Records</h2>
+        <span>{filteredVisitors.length} records</span>
       </div>
-
-      {/* Table */}
-      <h2>Visitors</h2>
 
       <div className="table-container">
 
@@ -272,20 +254,18 @@ function Dashboard() {
           <tbody>
 
             {filteredVisitors.length === 0 ? (
-
               <tr>
-                <td colSpan="9">
+                <td colSpan="9" className="no-data">
                   No visitors found
                 </td>
               </tr>
-
             ) : (
-
               filteredVisitors.map((visitor) => (
-
                 <tr key={visitor._id}>
 
-                  <td>{visitor.name}</td>
+                  <td>
+                    <strong>{visitor.name}</strong>
+                  </td>
 
                   <td>{visitor.mobile}</td>
 
@@ -300,58 +280,49 @@ function Dashboard() {
                   </td>
 
                   <td>
-                    {new Date(
-                      visitor.entryTime
-                    ).toLocaleString()}
+                    {new Date(visitor.entryTime).toLocaleString()}
                   </td>
 
                   <td>
                     {visitor.exitTime
-                      ? new Date(
-                          visitor.exitTime
-                        ).toLocaleString()
+                      ? new Date(visitor.exitTime).toLocaleString()
                       : "-"}
                   </td>
 
                   <td>
-                    <span className="status">
+                    <span
+                      className={
+                        visitor.status === "Inside"
+                          ? "status status-inside"
+                          : "status status-exited"
+                      }
+                    >
                       {visitor.status}
                     </span>
                   </td>
 
                   <td>
 
-                    {/* View */}
                     <button
                       className="view-btn"
-                      onClick={() =>
-                        setSelectedVisitor(visitor)
-                      }
+                      onClick={() => setSelectedVisitor(visitor)}
                     >
                       View
                     </button>
 
-                    {/* Exit */}
                     <button
                       className="exit-btn"
-                      onClick={() =>
-                        handleExit(visitor._id)
-                      }
-                      disabled={
-                        visitor.status === "Exited"
-                      }
+                      onClick={() => handleExit(visitor._id)}
+                      disabled={visitor.status === "Exited"}
                     >
                       {visitor.status === "Exited"
                         ? "Exited"
                         : "Mark Exit"}
                     </button>
 
-                    {/* Delete */}
                     <button
                       className="delete-btn"
-                      onClick={() =>
-                        handleDelete(visitor._id)
-                      }
+                      onClick={() => handleDelete(visitor._id)}
                     >
                       Delete
                     </button>
@@ -359,9 +330,7 @@ function Dashboard() {
                   </td>
 
                 </tr>
-
               ))
-
             )}
 
           </tbody>
@@ -370,12 +339,16 @@ function Dashboard() {
 
       </div>
 
-      {/* Visitor Details Modal */}
       {selectedVisitor && (
+        <div
+          className="modal"
+          onClick={() => setSelectedVisitor(null)}
+        >
 
-        <div className="modal">
-
-          <div className="modal-content">
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
 
             <h2>Visitor Details</h2>
 
@@ -427,9 +400,7 @@ function Dashboard() {
 
             <button
               className="enter-btn"
-              onClick={() =>
-                setSelectedVisitor(null)
-              }
+              onClick={() => setSelectedVisitor(null)}
             >
               Close
             </button>
@@ -437,7 +408,6 @@ function Dashboard() {
           </div>
 
         </div>
-
       )}
 
     </div>

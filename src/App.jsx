@@ -27,7 +27,7 @@ function App() {
 
     try {
       const response = await fetch(
-     `${import.meta.env.VITE_API_URL}/api/visitors`,
+        `${import.meta.env.VITE_API_URL}/api/visitors`,
         {
           method: "POST",
           headers: {
@@ -84,7 +84,6 @@ function App() {
 
       </div>
 
-
       {/* Visitor Entry */}
       {page === "entry" && (
         <div className="entry-section">
@@ -115,9 +114,18 @@ function App() {
               <input
                 type="tel"
                 name="mobile"
-                placeholder="Enter mobile number"
+                placeholder="Enter 10-digit mobile number"
                 value={formData.mobile}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+
+                  setFormData({
+                    ...formData,
+                    mobile: value
+                  });
+                }}
+                pattern="[0-9]{10}"
+                maxLength="10"
                 required
               />
 
@@ -166,34 +174,29 @@ function App() {
         </div>
       )}
 
-
       {/* Admin Section */}
       {page === "admin" && !isAdminLoggedIn && (
         <AdminLogin onLogin={handleAdminLogin} />
       )}
 
-  {page === "admin" && isAdminLoggedIn && (
-  <>
-    <Dashboard />
+      {page === "admin" && isAdminLoggedIn && (
+        <>
+          <Dashboard />
 
-    <div style={{ textAlign: "center", marginBottom: "30px" }}>
-      <button
-        className="delete-btn"
-        // onClick={() => {
-        //   setIsAdminLoggedIn(false);
-        //   setPage("entry");
-        // }}
-        onClick={() => {
-  localStorage.removeItem("token");
-  setIsAdminLoggedIn(false);
-  setPage("entry");
-}}
-      >
-        Logout
-      </button>
-    </div>
-  </>
-)}
+          <div style={{ textAlign: "center", marginBottom: "30px" }}>
+            <button
+              className="delete-btn"
+              onClick={() => {
+                localStorage.removeItem("token");
+                setIsAdminLoggedIn(false);
+                setPage("entry");
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </>
+      )}
 
     </div>
   );
