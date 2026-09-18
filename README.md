@@ -56,5 +56,4 @@ room-visitor-system/
     ├── server.js
     └── .env
 ## Live Website
-
-https://room-visitor-frontend.onrender.com?utm_source=chatgpt.com
+https://room-visitor-frontend.onrender.com
