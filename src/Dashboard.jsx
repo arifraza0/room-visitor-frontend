@@ -175,28 +175,27 @@ function Dashboard() {
 
       <div className="stats">
 
-        <div className="card">
-          <h3>Total Visitors</h3>
-          <h2>{visitors.length}</h2>
-          <p>All time</p>
-        </div>
+     <div className="card">
+  <h3>Total Visitors</h3>
+  <h2>{visitors.length}</h2>
+</div>
 
         <div className="card">
           <h3>Today's Visitors</h3>
           <h2>{todayVisitors.length}</h2>
-          <p>Today</p>
+        
         </div>
 
         <div className="card">
           <h3>Currently Inside</h3>
           <h2>{insideVisitors.length}</h2>
-          <p>Active visitors</p>
+     
         </div>
 
         <div className="card">
           <h3>Exited</h3>
           <h2>{visitors.length - insideVisitors.length}</h2>
-          <p>Completed visits</p>
+        
         </div>
 
       </div>
@@ -217,14 +216,13 @@ function Dashboard() {
           </select>
         </div>
 
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search visitor..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+       <input
+  className="search-box"
+  type="text"
+  placeholder="Search visitor..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+/>
 
       </div>
 
