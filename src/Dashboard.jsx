@@ -340,6 +340,8 @@ function Dashboard() {
       {selectedVisitor && (
         <div
           className="modal"
+  //       <div
+  // className="modal-overlay"
           onClick={() => setSelectedVisitor(null)}
         >
 
